@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.DashboardController">
+    <children>
+        <VBox layoutX="0.0" layoutY="0.0" prefHeight="500.0" prefWidth="200.0" style="-fx-background-color: #2c3e50;">
+            <children>
+                <Label alignment="CENTER" prefHeight="80.0" prefWidth="200.0" text="Admin Panel" textFill="WHITE">
+                    <font><Font name="System Bold" size="20.0" /></font>
+                </Label>
+                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: #34495e;" text="Register Student" />
+                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: #34495e;" text="Face Recognition" />
+                <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: #34495e;" text="Attendance Reports" />
+            </children>
+        </VBox>
+
+        <Label layoutX="230.0" layoutY="30.0" text="Welcome to Dashboard">
+            <font><Font size="24.0" /></font>
+        </Label>
+        <Label layoutX="230.0" layoutY="80.0" text="Select an option from the menu to start." textFill="#7f8c8d" />
+    </children>
+</AnchorPane>
