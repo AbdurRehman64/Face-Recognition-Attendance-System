@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/resourses" type="java-resource" />
     </content>
-    <orderEntry type="jdk" jdkName="corretto-1.8" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="25" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="javafx.base" level="project" />
   </component>
