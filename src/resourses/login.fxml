@@ -1,42 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0"
-            styleClass="login-background"
-            stylesheets="@/css/style.css"
-            xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="login.LoginController">
+<StackPane prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: #2c3e50;"
+           xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="login.LoginController"
+           stylesheets="@/css/style.css">
     <children>
-        <Label layoutX="169.0" layoutY="45.0" prefHeight="76.0" prefWidth="261.0" text="Attendance System" textFill="#2c3e50">
-            <font>
-                <Font name="Book Antiqua" size="30.0" />
-            </font>
-        </Label>
-        <Label layoutX="150.0" layoutY="130.0" text="Username:" />
-        <TextField fx:id="usernameField" layoutX="150.0" layoutY="150.0" prefWidth="300.0" promptText="Enter admin" />
+        <VBox alignment="CENTER" maxWidth="300.0" maxHeight="350.0" spacing="20.0"
+              styleClass="card" style="-fx-background-radius: 15;">
+            <children>
+                <Label text="Admin Login" styleClass="header-label" style="-fx-font-size: 22px;"/>
 
-        <Label layoutX="150.0" layoutY="190.0" text="Password:" />
-        <PasswordField fx:id="passwordField" layoutX="150.0" layoutY="210.0" prefWidth="300.0" promptText="Enter 123" />
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Username" style="-fx-text-fill: #7f8c8d;"/>
+                    <TextField fx:id="usernameField" promptText="admin" styleClass="text-field"/>
+                </VBox>
 
-        <Button fx:id="loginButton" layoutX="150.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #2c3e50; -fx-text-fill: white;" styleClass="login-btn" text="Login">
-            <font>
-                <Font size="14.0" />
-            </font>
-        </Button>
-        <Label fx:id="errorLabel" layoutX="150.0" layoutY="310.0" textFill="RED" />
-      <ParallelCamera />
-      <ParallelCamera />
-      <PerspectiveCamera />
-      <ParallelCamera />
-      <AmbientLight lightOn="true">
-         <color>
-            <Color red="0.46101364493370056" green="0.9052631855010986" blue="0.01676413230597973" />
-         </color>
-      </AmbientLight>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Password" style="-fx-text-fill: #7f8c8d;"/>
+                    <PasswordField fx:id="passwordField" promptText="••••••" styleClass="text-field"/>
+                </VBox>
+
+                <Label fx:id="errorLabel" textFill="red"/>
+
+                <Button text="Login Securely" maxWidth="Infinity" styleClass="action-button"
+                        onAction="#handleLogin"
+                        style="-fx-padding: 10 20; -fx-font-size: 14px;"/>
+            </children>
+        </VBox>
     </children>
-</AnchorPane>
+</StackPane>
