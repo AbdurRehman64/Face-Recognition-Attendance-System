@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane prefHeight="550.0" prefWidth="850.0"
+            stylesheets="@css/style.css"
+            xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="login.LoginController">
+
+    <center>
+        <HBox styleClass="main-container">
+            <children>
+                <VBox alignment="CENTER_LEFT" prefWidth="350.0" styleClass="branding-side" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="brand-logo" text="FRAS">
+                            <font>
+                                <Font name="Segoe UI Bold" size="36.0" />
+                            </font>
+                        </Text>
+                        <Label text="Face Recognition Attendance System" textFill="#e0e0e0">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="20.0" top="5.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label text="Secure. Fast. Reliable." textFill="#b0bec5">
+                            <font>
+                                <Font name="Segoe UI Italic" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                    </padding>
+                </VBox>
+
+                <VBox alignment="CENTER" prefWidth="500.0" spacing="25.0" styleClass="form-side" HBox.hgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label styleClass="heading-text" text="Welcome Back!" textFill="#333333">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="28.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Please sign in to continue." textFill="#7f8c8d">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
+                        </VBox>
+
+                        <VBox spacing="8.0" styleClass="input-group">
+                            <children>
+                                <Label styleClass="input-label" text="Username" />
+                                <TextField fx:id="usernameField" promptText="Enter your username" styleClass="input-field" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="8.0" styleClass="input-group">
+                            <children>
+                                <Label styleClass="input-label" text="Password" />
+                                <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field" />
+                            </children>
+                        </VBox>
+
+                        <Label fx:id="errorLabel" textFill="#e74c3c" wrapText="true">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Button fx:id="loginButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleLogin" styleClass="login-btn" text="SIGN IN">
+                            <font>
+                                <Font name="Segoe UI Bold" size="14.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="20.0" offsetY="5.0" radius="9.5" width="20.0">
+                                    <color>
+                                        <Color opacity="0.25" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                            <VBox.margin>
+                                <Insets top="10.0" />
+                            </VBox.margin>
+                        </Button>
+                    </children>
+                    <padding>
+                        <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </HBox>
+    </center>
+</BorderPane>

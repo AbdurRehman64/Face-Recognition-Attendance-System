@@ -1,0 +1,190 @@
+/* GLOBAL FONTS & COLORS */
+.root {
+    -fx-font-family: 'Segoe UI', 'Roboto', sans-serif;
+    /* Main container ka background */
+    -fx-background-color: #f4f7f6;
+}
+
+/* =========================================
+   NEW LOGIN SCREEN STYLING
+   ========================================= */
+
+/* Main container jo dono hisson ko rakhta hai */
+.main-container {
+    /* Halki si shadow pure box ke liye */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 30, 0, 0, 0);
+    /* Kono ko thora gol kiya */
+    -fx-background-radius: 15px;
+    /* Padding taake window ke bilkul kinare na lage */
+    -fx-padding: 30px;
+}
+
+/* LEFT SIDE: Branding Area (Professional Blue/Purple Gradient) */
+.branding-side {
+    /* Ek khoobsurat gradient background */
+    -fx-background-color: linear-gradient(to bottom right, #3f51b5, #5c6bc0, #283593);
+    -fx-background-radius: 15px 0 0 15px; /* Sirf baayin taraf ke konay gol */
+}
+
+.brand-logo {
+    -fx-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* RIGHT SIDE: Form Area (Clean White) */
+.form-side {
+    -fx-background-color: white;
+    -fx-background-radius: 0 15px 15px 0; /* Sirf daayin taraf ke konay gol */
+}
+
+.heading-text {
+    -fx-text-fill: #2c3e50;
+}
+
+.input-label {
+    -fx-text-fill: #546e7a;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Modern Input Fields */
+.input-field {
+    -fx-background-color: #eceff1; /* Halka gray background */
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 15px; /* Thori zyada padding achi lagti hai */
+    -fx-prompt-text-fill: #b0bec5;
+}
+
+.input-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #3f51b5; /* Focus karne par blue border */
+    -fx-border-width: 2px;
+}
+
+/* Modern Login Button */
+.login-btn {
+    /* Blue gradient button */
+    -fx-background-color: linear-gradient(to right, #3f51b5, #303f9f);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-background-radius: 30px; /* Pura gol button (capsule shape) */
+    -fx-cursor: hand;
+    -fx-padding: 12px 0;
+}
+
+.login-btn:hover {
+    /* Hover karne par thora dark gradient */
+    -fx-background-color: linear-gradient(to right, #303f9f, #283593);
+    -fx-effect: dropshadow(three-pass-box, rgba(63, 81, 181, 0.4), 15, 0, 0, 3); /* Hover par shadow barh jaye */
+}
+
+.input-group {
+    -fx-pref-width: 100%;
+}
+
+/* =========================================
+   DASHBOARD STYLING
+   ========================================= */
+
+/* Sidebar Gradient - Matching Login Screen */
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #283593, #3f51b5);
+}
+
+.brand-logo-small {
+    -fx-font-weight: bold;
+}
+
+/* Sidebar Navigation Buttons */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c5cae9; /* Light purple-white */
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+}
+
+/* Active Button (Jo page khula ho) */
+.nav-btn-active {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+    -fx-border-color: transparent transparent transparent white;
+    -fx-border-width: 0 0 0 4px; /* Left side white bar */
+    -fx-padding: 10px 15px;
+}
+
+/* Logout Button */
+.logout-btn {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-text-fill: #ffcdd2; /* Light Red */
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+}
+.logout-btn:hover {
+    -fx-background-color: #c62828;
+    -fx-text-fill: white;
+}
+
+/* Top Header Bar */
+.header-bar {
+    -fx-background-color: white;
+    -fx-border-color: #eceff1;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.page-title {
+    -fx-text-fill: #37474f;
+}
+
+/* Dashboard White Card */
+.dashboard-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    /* Use dropshadow effect in FXML instead of CSS for better performance */
+}
+
+/* Camera Placeholder Box */
+.camera-placeholder {
+    -fx-background-color: #eceff1;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cfd8dc;
+    -fx-border-style: dashed;
+    -fx-border-width: 2px;
+}
+
+/* Action Buttons */
+.primary-btn {
+    -fx-background-color: #3f51b5; /* Theme Blue */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+}
+.primary-btn:hover {
+    -fx-background-color: #303f9f;
+}
+
+.secondary-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #78909c;
+    -fx-border-color: #b0bec5;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 9px 20px;
+    -fx-cursor: hand;
+}
+.secondary-btn:hover {
+    -fx-background-color: #eceff1;
+}

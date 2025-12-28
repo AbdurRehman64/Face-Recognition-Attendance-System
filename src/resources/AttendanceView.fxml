@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="650.0" prefWidth="1000.0"
+            stylesheets="@css/style.css"
+            style="-fx-background-color: #f4f7f6;"
+            xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="login.AttendanceController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header-bar">
+            <children>
+                <Button text="← Back" onAction="#handleBack" styleClass="secondary-btn"/>
+
+                <Separator orientation="VERTICAL">
+                    <HBox.margin>
+                        <Insets left="15.0" right="15.0" />
+                    </HBox.margin>
+                </Separator>
+
+                <Label styleClass="page-title" text="Live Attendance Monitor">
+                    <font>
+                        <Font name="Segoe UI Bold" size="18.0" />
+                    </font>
+                </Label>
+
+                <Pane HBox.hgrow="ALWAYS" />
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <Circle fill="#2ecc71" radius="5.0" strokeType="INSIDE" strokeWidth="0.0" />
+                    <Label fx:id="dateTimeLabel" text="Live | 28 Dec 2025" textFill="#546e7a">
+                        <font>
+                            <Font name="Segoe UI Bold" size="14.0" />
+                        </font>
+                    </Label>
+                </HBox>
+            </children>
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+            <effect>
+                <DropShadow color="#0000001a" height="10.0" radius="4.5" width="10.0" />
+            </effect>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30;">
+            <StackPane maxWidth="640" maxHeight="480" styleClass="camera-placeholder" style="-fx-background-color: black;">
+                <children>
+                    <ImageView fx:id="cameraFrame" fitHeight="480.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true"/>
+
+                    <Label fx:id="cameraStatusLabel" text="Camera is Stopped" textFill="white">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                </children>
+                <effect>
+                    <DropShadow color="#00000033" height="30.0" radius="14.5" width="30.0" />
+                </effect>
+            </StackPane>
+
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="startBtn" text="▶ Start Camera" styleClass="primary-btn"
+                        style="-fx-background-color: #2ecc71; -fx-pref-width: 160;"/>
+
+                <Button fx:id="stopBtn" text="⏹ Stop Camera" styleClass="primary-btn"
+                        style="-fx-background-color: #e74c3c; -fx-pref-width: 160;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox prefWidth="300.0" spacing="15.0" styleClass="dashboard-card" style="-fx-background-radius: 0;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Recent Scans" styleClass="heading-text" style="-fx-font-size: 16px;"/>
+            <Separator />
+
+            <ListView fx:id="attendanceLog" VBox.vgrow="ALWAYS" style="-fx-background-color: #f9f9f9; -fx-background-radius: 5; -fx-border-color: #eceff1;"/>
+
+            <Button text="Export Report" styleClass="primary-btn" maxWidth="Infinity"/>
+        </VBox>
+    </right>
+
+</BorderPane>

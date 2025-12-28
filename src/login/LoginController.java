@@ -11,44 +11,65 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.net.URL;
 
 public class LoginController {
 
-    @FXML private TextField usernameField;  // Aapka fx:id check kar lena
+    @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
+    @FXML private javafx.scene.control.Button loginButton; // Button ka reference
 
-    // Login Button dabane par yeh chalega
     @FXML
     public void handleLogin(ActionEvent event) {
         String user = usernameField.getText();
         String pass = passwordField.getText();
 
-        // Check (filhal hardcode rakha hai check karne k liye)
+        System.out.println("👉 Login Button Clicked!"); // Console check karein
+
         if (user.equals("admin") && pass.equals("123")) {
-
+            System.out.println("✅ Credentials Correct. Loading Dashboard...");
             try {
-                // 1. Dashboard file load karna
-                // NOTE: Path check karein. Agar fxml folder mein hai to "/fxml/dashboard.fxml"
-                // Agar direct src mein hai to "dashboard.fxml"
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
-                Parent root = loader.load();
+                // 1. Path Check Karein
+                URL url = getClass().getResource("/dashboard.fxml");
+                System.out.println("🔍 Checking path for dashboard.fxml: " + url);
 
-                // 2. Current window (Stage) ko pakarna
+                if (url == null) {
+                    System.out.println("❌ ERROR: File 'dashboard.fxml' nahi mili!");
+                    System.out.println("👉 Solution: Project Rebuild karein ya check karein ke file 'resources' folder mein hai.");
+                    errorLabel.setText("System Error: Dashboard file missing.");
+                    return;
+                }
+
+                // 2. Loader Setup
+                FXMLLoader loader = new FXMLLoader(url);
+                Parent root = loader.load(); // Yahan error aa sakta hai agar Controller ghalat ho
+
+                // 3. Stage & Scene
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-                // 3. Naya scene set karna (Dashboard)
                 Scene scene = new Scene(root);
+
+                // CSS Link
+                URL cssUrl = getClass().getResource("/css/style.css");
+                if (cssUrl != null) {
+                    scene.getStylesheets().add(cssUrl.toExternalForm());
+                } else {
+                    System.out.println("⚠️ Warning: CSS file nahi mili.");
+                }
+
                 stage.setScene(scene);
+                stage.setTitle("Admin Dashboard");
                 stage.show();
+                System.out.println("🚀 Dashboard Opened Successfully!");
 
             } catch (IOException e) {
-                e.printStackTrace();
-                errorLabel.setText("Error loading Dashboard file!");
+                System.out.println("❌ ERROR: Dashboard load karte waqt crash ho gaya!");
+                e.printStackTrace(); // Yeh poora error console mein dikhayega
+                errorLabel.setText("Error loading Dashboard.");
             }
-
         } else {
-            errorLabel.setText("Wrong Username or Password!");
+            System.out.println("❌ Wrong Password entered.");
+            errorLabel.setText("Invalid Username or Password!");
         }
     }
 }
