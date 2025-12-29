@@ -15,7 +15,7 @@ public class AttendanceController {
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

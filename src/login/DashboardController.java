@@ -11,6 +11,28 @@ import java.io.IOException;
 
 public class DashboardController {
 
+    @FXML
+    public void handleReportsBtn(ActionEvent event) {
+        loadScreen(event, "/dashboard.fxml", "Admin Dashboard");
+    }
+
+    @FXML
+    public void handleTrainBtn(ActionEvent event) {
+        loadScreen(event, "/TrainDataView.fxml", "Train Data");
+    }
+
+
+
+    @FXML
+    private void goToReports(ActionEvent event) {
+        loadScreen(event, "/ReportsView.fxml", "Attendance Reports");
+    }
+
+   /* @FXML
+    private void goToTrain(ActionEvent event) {
+        loadScreen(event, "/TrainDataView.fxml", "Train Data");
+    }*/
+
     // 1. Attendance Screen par jane ke liye
     @FXML
     private void goToAttendance(ActionEvent event) {
