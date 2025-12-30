@@ -6,70 +6,110 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.IOException;
-import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class LoginController {
 
+    // FXML Elements (Inka naam FXML file se match hona chahiye)
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
-    @FXML private javafx.scene.control.Button loginButton; // Button ka reference
+    @FXML private Button loginButton;
 
+    // --- LOGIN BUTTON ACTION ---
     @FXML
     public void handleLogin(ActionEvent event) {
-        String user = usernameField.getText();
-        String pass = passwordField.getText();
+        String userInput = usernameField.getText();
+        String passInput = passwordField.getText();
 
-        System.out.println("👉 Login Button Clicked!"); // Console check karein
+        // 1. Validation: Agar fields khali hain to rook do
+        if (userInput.isEmpty() || passInput.isEmpty()) {
+            errorLabel.setText("Please enter Username and Password.");
+            return;
+        }
 
-        if (user.equals("admin") && pass.equals("123")) {
-            System.out.println("✅ Credentials Correct. Loading Dashboard...");
-            try {
-                // 1. Path Check Karein
-                URL url = getClass().getResource("/dashboard.fxml");
-                System.out.println("🔍 Checking path for dashboard.fxml: " + url);
+        // 2. Database Connection
+        Connection conn = DatabaseHandler.getDBConnection();
 
-                if (url == null) {
-                    System.out.println("❌ ERROR: File 'dashboard.fxml' nahi mili!");
-                    System.out.println("👉 Solution: Project Rebuild karein ya check karein ke file 'resources' folder mein hai.");
-                    errorLabel.setText("System Error: Dashboard file missing.");
-                    return;
-                }
+        // Agar connection nahi bana (Shayad XAMPP off hai)
+        if (conn == null) {
+            errorLabel.setText("Database Connection Failed! Check XAMPP.");
+            return;
+        }
 
-                // 2. Loader Setup
-                FXMLLoader loader = new FXMLLoader(url);
-                Parent root = loader.load(); // Yahan error aa sakta hai agar Controller ghalat ho
+        try {
+            // 3. SQL Query: Check karo ke user database mein hai ya nahi
+            String query = "SELECT * FROM admin_users WHERE username = ? AND password = ?";
 
-                // 3. Stage & Scene
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                Scene scene = new Scene(root);
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, userInput);
+            pst.setString(2, passInput);
 
-                // CSS Link
-                URL cssUrl = getClass().getResource("/css/style.css");
-                if (cssUrl != null) {
-                    scene.getStylesheets().add(cssUrl.toExternalForm());
-                } else {
-                    System.out.println("⚠️ Warning: CSS file nahi mili.");
-                }
+            ResultSet rs = pst.executeQuery();
 
-                stage.setScene(scene);
-                stage.setTitle("Admin Dashboard");
-                stage.show();
-                System.out.println("🚀 Dashboard Opened Successfully!");
+            if (rs.next()) {
+                // ✅ Login Successful
+                System.out.println("✅ Credentials Verified! Opening Dashboard...");
 
-            } catch (IOException e) {
-                System.out.println("❌ ERROR: Dashboard load karte waqt crash ho gaya!");
-                e.printStackTrace(); // Yeh poora error console mein dikhayega
-                errorLabel.setText("Error loading Dashboard.");
+                // Dashboard kholne wala function call karo
+                openDashboard(event);
+
+            } else {
+                // ❌ Wrong Password
+                errorLabel.setText("Invalid Username or Password!");
+                System.out.println("❌ Login Failed: Wrong credentials.");
             }
-        } else {
-            System.out.println("❌ Wrong Password entered.");
-            errorLabel.setText("Invalid Username or Password!");
+
+            // Resources close karo taake memory leak na ho
+            pst.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            errorLabel.setText("Database Error.");
+        }
+    }
+
+    // --- DASHBOARD OPEN KARNE KA METHOD ---
+    private void openDashboard(ActionEvent event) {
+        try {
+            // 1. Dashboard FXML Load karo
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard.fxml"));
+            Parent root = loader.load();
+
+            // 2. Current Window (Stage) hasil karo
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // 3. Scene Setup karo
+            Scene scene = new Scene(root);
+
+            // CSS Link karna
+            String cssPath = "/css/style.css";
+            if (getClass().getResource(cssPath) != null) {
+                scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+            } else {
+                System.out.println("⚠️ Warning: CSS file nahi mili.");
+            }
+
+            stage.setScene(scene);
+            stage.setTitle("Admin Dashboard");
+            stage.centerOnScreen(); // Window ko screen ke beech mein lao
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("❌ Error loading Dashboard FXML!");
+            e.printStackTrace();
+            errorLabel.setText("System Error: Dashboard file missing.");
         }
     }
 }

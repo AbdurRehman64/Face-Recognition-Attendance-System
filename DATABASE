@@ -1,0 +1,46 @@
+DROP DATABASE IF EXISTS fras_db;
+CREATE DATABASE fras_db;
+
+USE fras_db;
+
+-- ==========================================
+-- TABLE 1: ADMIN LOGIN (Login Screen ke liye)
+-- ==========================================
+CREATE TABLE admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL
+);
+
+-- Default Admin Insert karein (Taake aap login kar sakein)
+-- Username: admin | Password: 123
+INSERT INTO admin_users (username, password) VALUES ('admin', '123');
+
+
+-- ==========================================
+-- TABLE 2: STUDENTS (Dashboard se data yahan aayega)
+-- ==========================================
+CREATE TABLE students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    roll_number VARCHAR(50) NOT NULL UNIQUE, -- Roll No duplicate nahi ho sakta
+    course VARCHAR(100),
+    department VARCHAR(100),
+    face_image_path VARCHAR(255), -- Chehre ki photo ka path
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ==========================================
+-- TABLE 3: ATTENDANCE (Attendance Screen ke liye)
+-- ==========================================
+CREATE TABLE attendance_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_roll_number VARCHAR(50) NOT NULL,
+    student_name VARCHAR(100),
+    attendance_date DATE NOT NULL,
+    attendance_time TIME NOT NULL,
+    status VARCHAR(20) DEFAULT 'Present',
+    FOREIGN KEY (student_roll_number) REFERENCES students(roll_number) ON DELETE CASCADE
+);
+select*from students;
