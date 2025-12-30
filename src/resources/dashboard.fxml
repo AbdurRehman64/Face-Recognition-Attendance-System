@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -51,11 +52,14 @@
                 <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                     <children>
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Dashboard" />
+
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="+ Add Student" />
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#goToAttendance" styleClass="nav-btn" text="Take Attendance" />
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Reports" onAction="#goToReports" />
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Train Data" onAction="#handleTrainBtn" />
+
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Reports" />
+
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Train Data" />
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" top="10.0" />
@@ -118,31 +122,34 @@
                         <HBox spacing="20.0">
                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                 <Label styleClass="input-label" text="Full Name" />
-                                <TextField promptText="e.g. Ali Khan" styleClass="input-field" />
+                                <TextField fx:id="nameField" promptText="e.g. Ali Khan" styleClass="input-field" />
                             </VBox>
                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                 <Label styleClass="input-label" text="Roll Number" />
-                                <TextField promptText="e.g. CS-2025-01" styleClass="input-field" />
+                                <TextField fx:id="rollNoField" promptText="e.g. CS-2025-01" styleClass="input-field" />
                             </VBox>
                         </HBox>
 
                         <VBox spacing="5.0">
                             <Label styleClass="input-label" text="Department / Course" />
-                            <TextField promptText="e.g. Software Engineering" styleClass="input-field" />
+                            <TextField fx:id="depField" promptText="e.g. Software Engineering" styleClass="input-field" />
                         </VBox>
 
                         <VBox spacing="5.0">
                             <Label styleClass="input-label" text="Face Capture" />
-                            <StackPane prefHeight="200.0" styleClass="camera-placeholder">
+                            <StackPane prefHeight="240.0" styleClass="camera-placeholder" style="-fx-background-color: #000;">
                                 <children>
-                                    <Label text="Webcam Feed Loading..." textFill="#90a4ae" />
+                                    <ImageView fx:id="cameraView" fitHeight="240.0" fitWidth="320.0" preserveRatio="true" />
                                 </children>
                             </StackPane>
                         </VBox>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                            <Button styleClass="secondary-btn" text="Reset Form" />
-                            <Button styleClass="primary-btn" text="Save Student Record" />
+                            <Button text="Reset Form" styleClass="secondary-btn" />
+
+                            <Button fx:id="captureBtn" text="Capture Face" styleClass="primary-btn" style="-fx-background-color: #e67e22;" />
+
+                            <Button fx:id="saveBtn" text="Save Student" styleClass="primary-btn" />
                         </HBox>
                     </children>
                     <padding>
