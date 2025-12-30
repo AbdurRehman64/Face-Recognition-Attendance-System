@@ -11,5 +11,7 @@
     <orderEntry type="library" exported="" name="javafx.base" level="project" />
     <orderEntry type="library" name="javafx.base1" level="project" />
     <orderEntry type="library" name="mysql.connector.java" level="project" />
+    <orderEntry type="library" name="java" level="project" />
+    <orderEntry type="library" name="opencv-460" level="project" />
   </component>
 </module>
