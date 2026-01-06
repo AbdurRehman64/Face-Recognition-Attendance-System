@@ -13,10 +13,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
+// OpenCV Imports (Updated)
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier; // Chehra dhoondne wali class
 import org.opencv.videoio.VideoCapture;
 
 import java.io.ByteArrayInputStream;
@@ -40,21 +41,30 @@ public class DashboardController {
     @FXML private TextField depField;
 
     // OpenCV Variables
-    // ⚠️ FIXED: Yahan 'new VideoCapture()' nahi likhna
     private VideoCapture capture;
     private ScheduledExecutorService timer;
     private boolean cameraActive = false;
 
+    // --- FACE DETECTION VARIABLES (NEW) ---
+    private CascadeClassifier faceDetector;
+    private MatOfRect faceDetections;
+
     // --- INITIALIZE ---
     @FXML
     public void initialize() {
-        // 1. Pehle Library Load karo
+        // 1. Load Native Library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        // 2. Ab Camera Object banao (Library load hone ke baad)
+        // 2. Load Haar Cascade (Chehra pehchanne wali file)
+        this.faceDetector = new CascadeClassifier();
+        // Make sure "haarcascade_frontalface_alt.xml" project folder mein hai
+        this.faceDetector.load("haarcascade_frontalface_alt.xml");
+        this.faceDetections = new MatOfRect();
+
+        // 3. Initialize Camera Object
         this.capture = new VideoCapture();
 
-        // 3. Camera Start karo
+        // 4. Start Camera
         startCamera();
 
         // Actions
@@ -62,19 +72,42 @@ public class DashboardController {
         captureBtn.setOnAction(this::handleCaptureFace);
     }
 
-    // --- CAMERA LOGIC ---
+    // --- CAMERA & DETECTION LOGIC ---
     private void startCamera() {
         if (!cameraActive) {
             capture.open(0); // 0 = Default Camera
             if (capture.isOpened()) {
                 cameraActive = true;
+
                 Runnable frameGrabber = () -> {
                     Mat frame = new Mat();
                     if (capture.read(frame)) {
+
+                        // --- FACE DETECTION START ---
+                        Mat grayFrame = new Mat();
+                        // 1. Color ko Gray mein convert karo (Fast processing ke liye)
+                        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+                        // 2. Lighting adjust karo
+                        Imgproc.equalizeHist(grayFrame, grayFrame);
+
+                        // 3. Chehra dhoondo! (Minimum size 30x30)
+                        this.faceDetector.detectMultiScale(grayFrame, this.faceDetections);
+
+                        // 4. Jo chehre mile, unke gird Green Box banao
+                        for (Rect rect : this.faceDetections.toArray()) {
+                            Imgproc.rectangle(frame,
+                                    new Point(rect.x, rect.y),
+                                    new Point(rect.x + rect.width, rect.y + rect.height),
+                                    new Scalar(0, 255, 0), 2); // Green Color
+                        }
+                        // --- FACE DETECTION END ---
+
+                        // Image JavaFX format mein convert karke screen par dikhao
                         Image imageToShow = mat2Image(frame);
                         Platform.runLater(() -> cameraView.setImage(imageToShow));
                     }
                 };
+
                 timer = Executors.newSingleThreadScheduledExecutor();
                 timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
             } else {
@@ -97,8 +130,12 @@ public class DashboardController {
     // --- BUTTON ACTIONS ---
 
     private void handleCaptureFace(ActionEvent event) {
-        System.out.println("📸 Capture Button Clicked!");
-        // Future code: Save image logic here
+        // Check karo ke kya koi chehra detect hua hai?
+        if (this.faceDetections.toArray().length > 0) {
+            System.out.println("📸 Face Detected! (Isay hum jald hi save karna seekhenge)");
+        } else {
+            System.out.println("⚠️ No Face Detected! Please look at the camera.");
+        }
     }
 
     private void handleSaveStudent(ActionEvent event) {
