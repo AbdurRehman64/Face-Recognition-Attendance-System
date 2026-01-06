@@ -13,14 +13,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-// OpenCV Imports (Updated)
+// OpenCV Imports
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier; // Chehra dhoondne wali class
+import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 
+// Java IO & SQL Imports
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,9 +47,12 @@ public class DashboardController {
     private ScheduledExecutorService timer;
     private boolean cameraActive = false;
 
-    // --- FACE DETECTION VARIABLES (NEW) ---
+    // Face Detection Variables
     private CascadeClassifier faceDetector;
     private MatOfRect faceDetections;
+
+    // ⭐ NEW: Photo ka Path save karne ke liye variable
+    private String currentImagePath = null;
 
     // --- INITIALIZE ---
     @FXML
@@ -55,13 +60,12 @@ public class DashboardController {
         // 1. Load Native Library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        // 2. Load Haar Cascade (Chehra pehchanne wali file)
+        // 2. Load Haar Cascade
         this.faceDetector = new CascadeClassifier();
-        // Make sure "haarcascade_frontalface_alt.xml" project folder mein hai
         this.faceDetector.load("haarcascade_frontalface_alt.xml");
         this.faceDetections = new MatOfRect();
 
-        // 3. Initialize Camera Object
+        // 3. Initialize Camera
         this.capture = new VideoCapture();
 
         // 4. Start Camera
@@ -75,7 +79,7 @@ public class DashboardController {
     // --- CAMERA & DETECTION LOGIC ---
     private void startCamera() {
         if (!cameraActive) {
-            capture.open(0); // 0 = Default Camera
+            capture.open(0);
             if (capture.isOpened()) {
                 cameraActive = true;
 
@@ -83,26 +87,20 @@ public class DashboardController {
                     Mat frame = new Mat();
                     if (capture.read(frame)) {
 
-                        // --- FACE DETECTION START ---
+                        // Face Detection Logic
                         Mat grayFrame = new Mat();
-                        // 1. Color ko Gray mein convert karo (Fast processing ke liye)
                         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
-                        // 2. Lighting adjust karo
                         Imgproc.equalizeHist(grayFrame, grayFrame);
 
-                        // 3. Chehra dhoondo! (Minimum size 30x30)
                         this.faceDetector.detectMultiScale(grayFrame, this.faceDetections);
 
-                        // 4. Jo chehre mile, unke gird Green Box banao
                         for (Rect rect : this.faceDetections.toArray()) {
                             Imgproc.rectangle(frame,
                                     new Point(rect.x, rect.y),
                                     new Point(rect.x + rect.width, rect.y + rect.height),
-                                    new Scalar(0, 255, 0), 2); // Green Color
+                                    new Scalar(0, 255, 0), 2);
                         }
-                        // --- FACE DETECTION END ---
 
-                        // Image JavaFX format mein convert karke screen par dikhao
                         Image imageToShow = mat2Image(frame);
                         Platform.runLater(() -> cameraView.setImage(imageToShow));
                     }
@@ -127,54 +125,105 @@ public class DashboardController {
         }
     }
 
-    // --- BUTTON ACTIONS ---
-
+    // --- CAPTURE BUTTON ACTION (Photo Save Logic) ---
     private void handleCaptureFace(ActionEvent event) {
-        // Check karo ke kya koi chehra detect hua hai?
+        String rollNo = rollNoField.getText().trim();
+
+        // Validation: Roll number zaroori hai filename ke liye
+        if (rollNo.isEmpty()) {
+            System.out.println("⚠️ Error: Pehle Roll Number likhein!");
+            return;
+        }
+
+        // Check karo face detect hua ya nahi
         if (this.faceDetections.toArray().length > 0) {
-            System.out.println("📸 Face Detected! (Isay hum jald hi save karna seekhenge)");
+            Mat frame = new Mat();
+            if (capture.read(frame)) {
+
+                // Pehla chehra crop karo
+                Rect rect = this.faceDetections.toArray()[0];
+                Mat faceOnly = new Mat(frame, rect);
+                Imgproc.cvtColor(faceOnly, faceOnly, Imgproc.COLOR_BGR2GRAY);
+
+                // Folder aur File setup
+                File directory = new File("saved_faces");
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                String finalFileName = rollNo + "_" + System.currentTimeMillis() + ".jpg";
+                File fileToSave = new File(directory, finalFileName);
+
+                // Image Save karo
+                boolean saved = Imgcodecs.imwrite(fileToSave.getAbsolutePath(), faceOnly);
+
+                if (saved) {
+                    // ⭐ Path ko variable mein store kar liya
+                    this.currentImagePath = fileToSave.getAbsolutePath();
+
+                    System.out.println("✅ Photo Saved! Path: " + this.currentImagePath);
+                    captureBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // Green Button
+                    captureBtn.setText("Captured!");
+                } else {
+                    System.out.println("❌ Error: File save nahi hui.");
+                }
+            }
         } else {
-            System.out.println("⚠️ No Face Detected! Please look at the camera.");
+            System.out.println("⚠️ No Face Detected!");
         }
     }
 
+    // --- SAVE BUTTON ACTION (Database Logic) ---
     private void handleSaveStudent(ActionEvent event) {
         String name = nameField.getText();
         String roll = rollNoField.getText();
         String dept = depField.getText();
 
+        // Validation
         if (name.isEmpty() || roll.isEmpty() || dept.isEmpty()) {
             System.out.println("⚠️ Please fill all fields!");
             return;
+        }
+
+        if (this.currentImagePath == null) {
+            System.out.println("⚠️ Warning: Photo capture nahi ki gayi!");
+            // Agar aap chahein to yahan 'return' laga dein taake bina photo save na ho
         }
 
         saveToDatabase(name, roll, dept);
     }
 
     private void saveToDatabase(String name, String roll, String dept) {
-        String query = "INSERT INTO students (full_name, roll_number, department) VALUES (?, ?, ?)";
+        // Query mein 4th value (face_image_path) add ki hai
+        String query = "INSERT INTO students (full_name, roll_number, department, face_image_path) VALUES (?, ?, ?, ?)";
+
         try (Connection conn = DatabaseHandler.getDBConnection();
              PreparedStatement pst = conn.prepareStatement(query)) {
 
             pst.setString(1, name);
             pst.setString(2, roll);
             pst.setString(3, dept);
+            pst.setString(4, this.currentImagePath); // Photo ka path yahan jayega
 
             int result = pst.executeUpdate();
             if (result > 0) {
-                System.out.println("✅ Student Saved: " + name);
+                System.out.println("✅ Student & Photo Linked Successfully!");
+
+                // Form Reset Logic
                 nameField.clear();
                 rollNoField.clear();
                 depField.clear();
+                captureBtn.setStyle(null);
+                captureBtn.setText("Capture Face");
+                this.currentImagePath = null; // Path reset
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ Error Saving Data");
+            System.out.println("❌ Error Saving Data to Database");
         }
     }
 
     // --- NAVIGATION METHODS ---
-
     @FXML
     private void goToAttendance(ActionEvent event) {
         stopCamera();
