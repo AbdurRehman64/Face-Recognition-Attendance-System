@@ -7,7 +7,7 @@ import org.opencv.core.Mat;
 public class TestOpenCV {
     public static void main(String[] args) {
         try {
-            // 1. Native Library Load karna (Yeh line har OpenCV code mein pehli honi chahiye)
+            // 1. Load the Native Library (This must be the first line in any OpenCV code)
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
             // 2. Version Check
@@ -19,11 +19,11 @@ public class TestOpenCV {
             System.out.println("m = \n" + m.dump());
 
         } catch (UnsatisfiedLinkError e) {
-            System.out.println("❌ Error: DLL file link nahi hui!");
-            System.out.println("Step 4 dobara check karein.");
+            System.out.println("❌ Error: DLL file not linked!");
+            System.out.println("Please double-check Step 4.");
             e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("❌ Koi aur error hai.");
+            System.out.println("❌ An unknown error occurred.");
             e.printStackTrace();
         }
     }

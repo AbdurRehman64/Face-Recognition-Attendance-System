@@ -45,7 +45,7 @@ public class AttendanceController {
     @FXML private Button startBtn;
     @FXML private Button stopBtn;
 
-    // Table Elements
+
     @FXML private TableView<AttendanceRow> attendanceTable;
     @FXML private TableColumn<AttendanceRow, String> colRoll;
     @FXML private TableColumn<AttendanceRow, String> colName;
@@ -101,8 +101,8 @@ public class AttendanceController {
 
                 // Check: Kya Haar Cascade load hua?
                 if (this.faceDetector.empty()) {
-                    System.out.println("❌ CRITICAL ERROR: haarcascade file load nahi hui!");
-                    System.out.println("Make sure 'haarcascade_frontalface_alt.xml' project folder mein hai.");
+                    System.out.println("❌ CRITICAL ERROR: The haarcascade file did not load!");
+                    System.out.println("Make sure 'haarcascade_frontalface_alt.xml' is in the project folder.");
                     return;
                 }
 
@@ -171,7 +171,7 @@ public class AttendanceController {
                 startBtn.setDisable(true);
                 stopBtn.setDisable(false);
             } else {
-                System.out.println("❌ Error: Camera open nahi hua!");
+                System.out.println("❌ Error: Could not open the camera!");
             }
         }
     }
@@ -222,7 +222,7 @@ public class AttendanceController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ Database Error: Attendance save nahi hui!");
+            System.out.println("❌ Database Error: Attendance was not saved!");
         }
     }
 

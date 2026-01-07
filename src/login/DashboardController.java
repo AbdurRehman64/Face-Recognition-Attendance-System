@@ -112,7 +112,7 @@ public class DashboardController {
                 timer = Executors.newSingleThreadScheduledExecutor();
                 timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
             } else {
-                System.out.println("❌ Error: Camera open nahi ho raha!");
+                System.out.println("❌ Error: The webcam failed to initialize.");
             }
         }
     }
@@ -133,7 +133,7 @@ public class DashboardController {
         String rollNo = rollNoField.getText().trim();
 
         if (rollNo.isEmpty()) {
-            System.out.println("⚠️ Error: Pehle Roll Number likhein!");
+            System.out.println("Please provide a Roll Number before proceeding");
             return;
         }
 
@@ -192,7 +192,7 @@ public class DashboardController {
             captureBtn.setText("Captured (" + count + ")");
             captureBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
         } else {
-            System.out.println("⚠️ Error: Chehra detect nahi hua. Dobara try karein.");
+            System.out.println("⚠️ Error: Face not detected. Please try again.");
         }
     }
 
@@ -208,7 +208,7 @@ public class DashboardController {
         }
 
         if (this.currentImagePath == null) {
-            System.out.println("⚠️ Warning: Photo capture nahi ki gayi!");
+            System.out.println("⚠️ Warning: Capture failed.");
         }
 
         saveToDatabase(name, roll, dept);
@@ -277,7 +277,7 @@ public class DashboardController {
             System.out.println("✅ Reports Screen Opened Successfully!");
 
         } catch (IOException e) {
-            System.out.println("❌ ERROR: Reports Screen nahi khul rahi!");
+            System.out.println("❌ ERROR: The Reports Screen is not opening!");
             e.printStackTrace(); // Console mein error dekhein
         }
     }

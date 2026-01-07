@@ -6,26 +6,26 @@ import java.sql.SQLException;
 
 public class DatabaseHandler {
 
-    // Database ki settings
+    // Database settings
     private static final String DB_URL = "jdbc:mysql://localhost:3306/fras_db";
     private static final String USER = "root";
     private static final String PASS = "";
 
-    // Yeh method connection wapis karega
+    // This method will return the connection
     public static Connection getDBConnection() {
         Connection connection = null;
         try {
-            // 1. Driver Load karna
+            // 1. Load Driver
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            // 2. Connection Banana
+            // 2. Create Connection
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
 
         } catch (ClassNotFoundException e) {
-            System.out.println("❌ Error: MySQL Driver nahi mila! (Library add karein)");
+            System.out.println("❌ Error: MySQL Driver not found! (Add the library)");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("❌ Error: Database connect nahi hua! (XAMPP check karein)");
+            System.out.println("❌ Error: Database did not connect! (Check XAMPP)");
             e.printStackTrace();
         }
         return connection;
