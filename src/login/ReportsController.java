@@ -20,7 +20,6 @@ import java.time.LocalDate;
 
 public class ReportsController {
 
-    // --- FXML UI Elements ---
     @FXML private TableView<AttendanceLog> reportsTable;
     @FXML private TableColumn<AttendanceLog, String> colDate;
     @FXML private TableColumn<AttendanceLog, String> colRoll;
@@ -31,20 +30,19 @@ public class ReportsController {
     @FXML private DatePicker datePicker;
     @FXML private TextField searchField;
 
-    // Data List
+
     private ObservableList<AttendanceLog> attendanceList = FXCollections.observableArrayList();
 
-    // --- INITIALIZE ---
+
     @FXML
     public void initialize() {
-        // Columns Link karo
+
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colRoll.setCellValueFactory(new PropertyValueFactory<>("rollNo"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colTime.setCellValueFactory(new PropertyValueFactory<>("time"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Load Initial Data (Sab records dikhao)
         loadData("SELECT * FROM attendance_logs ORDER BY attendance_date DESC, attendance_time DESC");
     }
 
@@ -52,7 +50,7 @@ public class ReportsController {
     private void loadData(String query) {
         attendanceList.clear();
 
-        System.out.println("🔎 Executing Query: " + query); // Debugging line
+        System.out.println(" Executing Query: " + query); // Debugging line
 
         try (Connection conn = DatabaseHandler.getDBConnection();
              PreparedStatement pst = conn.prepareStatement(query);
@@ -70,30 +68,29 @@ public class ReportsController {
             reportsTable.setItems(attendanceList);
 
             if(attendanceList.isEmpty()) {
-                System.out.println("⚠️ No records found for this search.");
+                System.out.println(" No records found for this search.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ Error Loading Reports");
+            System.out.println(" Error Loading Reports");
         }
     }
 
-    // --- SEARCH LOGIC (FIXED) ---
     @FXML
     private void handleSearch(ActionEvent event) {
         String searchText = searchField.getText().trim();
         LocalDate date = datePicker.getValue();
 
-        // Basic Query
+
         StringBuilder query = new StringBuilder("SELECT * FROM attendance_logs WHERE 1=1");
 
-        // 1. Agar Date select ki hai
+
         if (date != null) {
             query.append(" AND attendance_date = '").append(date.toString()).append("'");
         }
 
-        // 2. Agar Text likha hai (Naam ya Roll No)
+
         if (!searchText.isEmpty()) {
             // "LOWER" function use kiya taake chote/bade lafzon ka masla na ho
             query.append(" AND (student_name LIKE '%").append(searchText).append("%'")
@@ -147,7 +144,7 @@ public class ReportsController {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("❌ Failed to load screen: " + fxmlPath);
+            System.out.println(" Failed to load screen: " + fxmlPath);
         }
     }
 

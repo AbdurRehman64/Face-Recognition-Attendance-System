@@ -1,4 +1,4 @@
-package login; // Based on your screenshot, the package name is 'login'
+package login;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,20 +12,17 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // ✅ Step 1: Load the file
-            // Note: "/" means the system will look inside the 'resources' folder
+
             URL fxmlLocation = getClass().getResource("/login.fxml");
 
-            // ✅ Step 2: Check if the file was found
             if (fxmlLocation == null) {
                 System.out.println("------------------------------------------------");
-                System.out.println("❌ ERROR: 'login.fxml' file not found!");
-                System.out.println("👉 Make sure the file is inside the 'resources' folder.");
+                System.out.println(" ERROR: 'login.fxml' file not found!");
+                System.out.println(" Make sure the file is inside the 'resources' folder.");
                 System.out.println("------------------------------------------------");
-                return; // Stop execution here
+                return;
             }
 
-            // ✅ Step 3: Load the Scene
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
@@ -34,7 +31,7 @@ public class MainApp extends Application {
             primaryStage.show();
 
         } catch (Exception e) {
-            System.out.println("❌ An error occurred in the code:");
+            System.out.println("An error occurred in the code:");
             e.printStackTrace();
         }
     }

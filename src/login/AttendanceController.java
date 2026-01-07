@@ -51,47 +51,43 @@ public class AttendanceController {
     @FXML private TableColumn<AttendanceRow, String> colName;
     @FXML private TableColumn<AttendanceRow, String> colTime;
 
-    // List to hold table data
+
     private ObservableList<AttendanceRow> attendanceData = FXCollections.observableArrayList();
 
-    // Cooldown Logic: Key = RollNo, Value = Last Time
     private Map<String, Long> lastScanTime = new HashMap<>();
     private static final long COOLDOWN_TIME = 60 * 1000; // 1 Minute Wait
 
-    // OpenCV & Logic Variables
     private VideoCapture capture;
     private ScheduledExecutorService timer;
     private boolean cameraActive = false;
     private CascadeClassifier faceDetector;
     private FaceRecognizer recognizer;
 
-    // --- INITIALIZE ---
+
     @FXML
     public void initialize() {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        // Helper Classes Initialize
+
         this.faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
         this.recognizer = new FaceRecognizer();
 
-        // Table Setup
+
         colRoll.setCellValueFactory(new PropertyValueFactory<>("rollNo"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colTime.setCellValueFactory(new PropertyValueFactory<>("time"));
         attendanceTable.setItems(attendanceData);
 
-        // Buttons
+
         startBtn.setOnAction(event -> startCamera());
         stopBtn.setOnAction(event -> stopCamera());
 
-        // Auto Start
-        startCamera();
+                startCamera();
     }
 
-    // --- CAMERA & RECOGNITION LOGIC ---
+
     private void startCamera() {
         if (!cameraActive) {
-            // 1. DSHOW Zaroor Lagayein
             capture = new VideoCapture(0, org.opencv.videoio.Videoio.CAP_DSHOW);
 
             if (capture.isOpened()) {
@@ -99,7 +95,6 @@ public class AttendanceController {
                 statusLabel.setText("Scanning Active...");
                 System.out.println("✅ Camera Started Successfully!");
 
-                // Check: Kya Haar Cascade load hua?
                 if (this.faceDetector.empty()) {
                     System.out.println("❌ CRITICAL ERROR: The haarcascade file did not load!");
                     System.out.println("Make sure 'haarcascade_frontalface_alt.xml' is in the project folder.");
@@ -109,11 +104,9 @@ public class AttendanceController {
                 Runnable frameGrabber = () -> {
                     Mat frame = new Mat();
 
-                    // 2. Frame Read Check
                     if (capture.read(frame)) {
 
-                        // Debug: Har 50 frames ke baad bataye ke camera zinda hai
-                        // (Taake console spam na ho, lekin humein pata chale ke chal raha hai)
+
                         if (System.currentTimeMillis() % 2000 < 50) {
                             System.out.println("🔄 Camera Running... Frame Processing...");
                         }
@@ -126,12 +119,12 @@ public class AttendanceController {
                             Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
                             Imgproc.equalizeHist(grayFrame, grayFrame);
 
-                            // 4. Detection Logic
+
                             this.faceDetector.detectMultiScale(grayFrame, faces);
 
-                            // Debug: Agar 1 bhi chehra mila to foran batao
+
                             if (faces.toArray().length > 0) {
-                                System.out.println("👀 FACE DETECTED: " + faces.toArray().length);
+                                System.out.println(" FACE DETECTED: " + faces.toArray().length);
                             }
 
                             for (Rect rect : faces.toArray()) {
@@ -141,27 +134,26 @@ public class AttendanceController {
 
                                 Mat faceOnly = new Mat(grayFrame, rect);
 
-                                // 5. Recognition Check
                                 String rollNo = recognizer.recognizeFace(faceOnly);
 
                                 if (rollNo != null) {
-                                    System.out.println("🎉 MATCH: " + rollNo);
+                                    System.out.println("MATCH: " + rollNo);
                                     Platform.runLater(() -> markAttendance(rollNo));
                                     Imgproc.putText(frame, rollNo, new Point(rect.x, rect.y-10),
                                             Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0,255,0), 2);
                                 } else {
-                                    // System.out.println("❌ Face detected but not recognized");
+                                    // System.out.println(" Face detected but not recognized");
                                 }
                             }
 
                             Image imageToShow = mat2Image(frame);
                             Platform.runLater(() -> cameraView.setImage(imageToShow));
                         } catch (Exception e) {
-                            System.out.println("❌ ERROR during Processing: " + e.getMessage());
+                            System.out.println(" ERROR during Processing: " + e.getMessage());
                         }
 
                     } else {
-                        System.out.println("⚠️ Warning: Frame read failed (Blank Frame)");
+                        System.out.println("⚠Warning: Frame read failed (Blank Frame)");
                     }
                 };
 
@@ -171,7 +163,7 @@ public class AttendanceController {
                 startBtn.setDisable(true);
                 stopBtn.setDisable(false);
             } else {
-                System.out.println("❌ Error: Could not open the camera!");
+                System.out.println("Error: Could not open the camera!");
             }
         }
     }
@@ -184,7 +176,6 @@ public class AttendanceController {
         if (lastScanTime.containsKey(rollNo)) {
             long lastTime = lastScanTime.get(rollNo);
             if ((currentTime - lastTime) < COOLDOWN_TIME) {
-                // Abhi 1 minute nahi guzra, ignore karo
                 return;
             }
         }
@@ -201,7 +192,7 @@ public class AttendanceController {
         statusLabel.setText("Verified: " + studentName);
         statusLabel.setStyle("-fx-text-fill: #2ecc71;"); // Green
 
-        // 4. ⭐ DATABASE SAVE (No File Export)
+        // 4. DATABASE SAVE (No File Export)
         saveAttendanceToDB(rollNo, studentName);
     }
 
@@ -222,7 +213,7 @@ public class AttendanceController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ Database Error: Attendance was not saved!");
+            System.out.println("Database Error: Attendance was not saved!");
         }
     }
 

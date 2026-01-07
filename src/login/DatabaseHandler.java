@@ -9,7 +9,7 @@ public class DatabaseHandler {
     // Database settings
     private static final String DB_URL = "jdbc:mysql://localhost:3306/fras_db";
     private static final String USER = "root";
-    private static final String PASS = "";
+    private static final String PASS = "root";
 
     // This method will return the connection
     public static Connection getDBConnection() {
@@ -22,10 +22,10 @@ public class DatabaseHandler {
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
 
         } catch (ClassNotFoundException e) {
-            System.out.println("❌ Error: MySQL Driver not found! (Add the library)");
+            System.out.println(" Error: MySQL Driver not found! (Add the library)");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("❌ Error: Database did not connect! (Check XAMPP)");
+            System.out.println(" Error: Database did not connect! (Check XAMPP)");
             e.printStackTrace();
         }
         return connection;

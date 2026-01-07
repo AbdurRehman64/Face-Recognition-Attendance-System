@@ -80,7 +80,6 @@ public class DashboardController {
     // --- CAMERA & DETECTION LOGIC ---
     private void startCamera() {
         if (!cameraActive) {
-            // 👇 Yahan Change kiya hai
             capture = new VideoCapture(0, Videoio.CAP_DSHOW);
 
             if (capture.isOpened()) {
@@ -112,7 +111,7 @@ public class DashboardController {
                 timer = Executors.newSingleThreadScheduledExecutor();
                 timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
             } else {
-                System.out.println("❌ Error: The webcam failed to initialize.");
+                System.out.println(" Error: The webcam failed to initialize.");
             }
         }
     }
@@ -128,7 +127,7 @@ public class DashboardController {
         }
     }
 
-    // --- ⭐ UPDATED: CAPTURE BUTTON ACTION (Multiple Photos) ---
+    // CAPTURE BUTTON ACTION (Multiple Photos) ---
     private void handleCaptureFace(ActionEvent event) {
         String rollNo = rollNoField.getText().trim();
 
@@ -142,26 +141,24 @@ public class DashboardController {
         if (!directory.exists()) directory.mkdirs();
 
         int count = 0;
-        int maxPhotos = 10; // Hum 10 Photos save karenge
+        int maxPhotos = 10;
 
-        // --- LOOP START ---
         for (int i = 0; i < maxPhotos; i++) {
             Mat frame = new Mat();
 
-            // Har baar naya frame pakdo camera se
+            //new frame
             if (capture.read(frame)) {
 
-                // Detection dobara run karo is naye frame par
+                // Detection
                 MatOfRect faces = new MatOfRect();
                 Mat grayFrame = new Mat();
                 Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
                 this.faceDetector.detectMultiScale(grayFrame, faces);
 
-                // Agar chehra mila
                 if (faces.toArray().length > 0) {
                     Rect rect = faces.toArray()[0];
                     Mat faceOnly = new Mat(frame, rect);
-                    // Grayscale save karenge (Recognition ke liye behtar hai)
+                    // Grayscale save
                     Imgproc.cvtColor(faceOnly, faceOnly, Imgproc.COLOR_BGR2GRAY);
 
                     // File Name: RollNo_Time_Counter.jpg
@@ -172,7 +169,7 @@ public class DashboardController {
 
                     if (saved) {
                         count++;
-                        System.out.println("📸 Photo " + count + " Saved");
+                        System.out.println(" Photo " + count + " Saved");
 
                         // Database ke liye sirf pehli photo ka path kaafi hai
                         if (this.currentImagePath == null) {
@@ -182,17 +179,15 @@ public class DashboardController {
                 }
             }
 
-            // Thora sa wait karo (50ms) taake photos mein thora difference aaye
             try { Thread.sleep(50); } catch (Exception e) {}
         }
-        // --- LOOP END ---
 
         if (count > 0) {
-            System.out.println("✅ Dataset Created! Total Photos: " + count);
+            System.out.println("Dataset Created! Total Photos: " + count);
             captureBtn.setText("Captured (" + count + ")");
             captureBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
         } else {
-            System.out.println("⚠️ Error: Face not detected. Please try again.");
+            System.out.println("Error: Face not detected. Please try again.");
         }
     }
 
@@ -203,12 +198,12 @@ public class DashboardController {
         String dept = depField.getText();
 
         if (name.isEmpty() || roll.isEmpty() || dept.isEmpty()) {
-            System.out.println("⚠️ Please fill all fields!");
+            System.out.println("Please fill all fields!");
             return;
         }
 
         if (this.currentImagePath == null) {
-            System.out.println("⚠️ Warning: Capture failed.");
+            System.out.println(" Warning: Capture failed.");
         }
 
         saveToDatabase(name, roll, dept);
@@ -227,7 +222,7 @@ public class DashboardController {
 
             int result = pst.executeUpdate();
             if (result > 0) {
-                System.out.println("✅ Student & Photo Linked Successfully!");
+                System.out.println(" Student & Photo Linked Successfully!");
 
                 // Form Reset Logic
                 nameField.clear();
@@ -239,11 +234,11 @@ public class DashboardController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ Error Saving Data to Database");
+            System.out.println("Error Saving Data to Database");
         }
     }
 
-    // --- NAVIGATION METHODS ---
+
     @FXML
     private void goToAttendance(ActionEvent event) {
         stopCamera();
@@ -252,32 +247,32 @@ public class DashboardController {
 
     @FXML
     private void goToReports(ActionEvent event) {
-        System.out.println("🔄 Trying to open Reports Screen..."); // Debugging Line
+        System.out.println(" Trying to open Reports Screen..."); // Debugging Line
 
         try {
-            // 1. FXML Load karo
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ReportsView.fxml"));
             Parent root = loader.load();
 
-            // 2. Scene Set karo
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
 
-            // 3. CSS Load (Agar hai to)
+
             String cssPath = "/css/style.css";
             if (getClass().getResource(cssPath) != null) {
                 scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
             }
 
-            // 4. Show karo
+
             stage.setScene(scene);
             stage.setTitle("Attendance Reports");
             stage.show();
 
-            System.out.println("✅ Reports Screen Opened Successfully!");
+            System.out.println(" Reports Screen Opened Successfully!");
 
         } catch (IOException e) {
-            System.out.println("❌ ERROR: The Reports Screen is not opening!");
+            System.out.println(" ERROR: The Reports Screen is not opening!");
             e.printStackTrace(); // Console mein error dekhein
         }
     }
@@ -309,7 +304,6 @@ public class DashboardController {
     }
     @FXML
     private void handleDashboardBtn(ActionEvent event) {
-        // Already on dashboard, do nothing or refresh
         System.out.println("Already on Dashboard");
     }
 

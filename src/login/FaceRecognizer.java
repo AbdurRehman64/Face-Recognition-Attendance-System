@@ -12,7 +12,6 @@ public class FaceRecognizer {
 
     private static final String IMAGE_FOLDER = "saved_faces";
 
-    // 👇 Threshold ko bohot kam kar diya hai testing ke liye
     private static final double THRESHOLD = 0.3;
 
     public String recognizeFace(Mat liveFace) {
@@ -30,7 +29,7 @@ public class FaceRecognizer {
         // System.out.println("--- Scaning New Frame ---"); // Debugging line
 
         for (File file : files) {
-            // Saved image ko Grayscale mein hi load karein
+            // loading save image to gray code
             Mat savedImage = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
 
             if (savedImage.empty()) continue;
@@ -41,8 +40,7 @@ public class FaceRecognizer {
             // 3. Compare Histograms
             double score = compareHistograms(processedLive, processedSaved);
 
-            // 👇 IMPORTANT: Console mein score print karwaya hai
-            // Agar score 0.1 bhi aaye to humein pata chal jayega
+            // Printing score in console
             if (score > 0.1) {
                 System.out.println("Checking: " + file.getName() + " | Score: " + String.format("%.2f", score));
             }
