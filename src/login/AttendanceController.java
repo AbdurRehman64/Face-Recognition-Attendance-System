@@ -1,5 +1,6 @@
 package login;
 
+import org.opencv.videoio.Videoio;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,16 +32,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javafx.stage.FileChooser; // Save dialog ke liye
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.File;
 
 public class AttendanceController {
 
@@ -57,71 +53,18 @@ public class AttendanceController {
 
     // List to hold table data
     private ObservableList<AttendanceRow> attendanceData = FXCollections.observableArrayList();
-    // Set to avoid duplicate entries (ek banda baar baar add na ho)
-    private Set<String> scannedRollNumbers = new HashSet<>();
+
+    // Cooldown Logic: Key = RollNo, Value = Last Time
+    private Map<String, Long> lastScanTime = new HashMap<>();
+    private static final long COOLDOWN_TIME = 60 * 1000; // 1 Minute Wait
 
     // OpenCV & Logic Variables
     private VideoCapture capture;
     private ScheduledExecutorService timer;
     private boolean cameraActive = false;
     private CascadeClassifier faceDetector;
-    private FaceRecognizer recognizer; // Hamari banayi hui class
+    private FaceRecognizer recognizer;
 
-    // --- EXPORT TO EXCEL (CSV) ---
-    @FXML
-    private void handleExport(ActionEvent event) {
-        // 1. Check karo table khali to nahi?
-        if (attendanceData.isEmpty()) {
-            System.out.println("⚠️ Table khali hai, export karne ke liye kuch nahi.");
-            return;
-        }
-
-        // 2. Save Dialog Kholo
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Attendance Report");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-
-        // Default file name: Attendance_Date.csv
-        String defaultName = "Attendance_" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv";
-        fileChooser.setInitialFileName(defaultName);
-
-        // Window reference lo
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        File file = fileChooser.showSaveDialog(stage);
-
-        if (file != null) {
-            saveToFile(file);
-        }
-    }
-
-    private void saveToFile(File file) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            // 3. Pehle Headers likho
-            writer.write("Roll Number,Name,Time");
-            writer.newLine();
-
-            // 4. Table ka sara data loop karke likho
-            for (AttendanceRow row : attendanceData) {
-                writer.write(row.getRollNo() + "," + row.getName() + "," + row.getTime());
-                writer.newLine();
-            }
-
-            System.out.println("✅ Report Exported Successfully: " + file.getAbsolutePath());
-            statusLabel.setText("Report Saved!");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("❌ Error saving file.");
-        }
-    }
-
-    // Puraana Set hata kar yeh Map use karein
-    // Key: RollNo, Value: Last Attendance Time (in milliseconds)
-    private java.util.Map<String, Long> lastScanTime = new java.util.HashMap<>();
-
-    // Cooldown Time: 30 Minutes (in milliseconds)
-    // 30 * 60 * 1000 = 1800000 ms
-    // Testing ke liye hum 1 Minute rakhte hain (60 * 1000)
-    private static final long COOLDOWN_TIME = 60 * 1000;
     // --- INITIALIZE ---
     @FXML
     public void initialize() {
@@ -146,66 +89,79 @@ public class AttendanceController {
     }
 
     // --- CAMERA & RECOGNITION LOGIC ---
-    // --- CAMERA & RECOGNITION LOGIC (DEBUG VERSION) ---
     private void startCamera() {
         if (!cameraActive) {
-            capture = new VideoCapture(0);
+            // 1. DSHOW Zaroor Lagayein
+            capture = new VideoCapture(0, org.opencv.videoio.Videoio.CAP_DSHOW);
+
             if (capture.isOpened()) {
                 cameraActive = true;
                 statusLabel.setText("Scanning Active...");
+                System.out.println("✅ Camera Started Successfully!");
 
-                // Debug Message
-                System.out.println("✅ Camera Start ho gaya. Scanning shuru...");
+                // Check: Kya Haar Cascade load hua?
+                if (this.faceDetector.empty()) {
+                    System.out.println("❌ CRITICAL ERROR: haarcascade file load nahi hui!");
+                    System.out.println("Make sure 'haarcascade_frontalface_alt.xml' project folder mein hai.");
+                    return;
+                }
 
                 Runnable frameGrabber = () -> {
                     Mat frame = new Mat();
+
+                    // 2. Frame Read Check
                     if (capture.read(frame)) {
 
-                        // 1. Detect Face
-                        MatOfRect faces = new MatOfRect();
+                        // Debug: Har 50 frames ke baad bataye ke camera zinda hai
+                        // (Taake console spam na ho, lekin humein pata chale ke chal raha hai)
+                        if (System.currentTimeMillis() % 2000 < 50) {
+                            System.out.println("🔄 Camera Running... Frame Processing...");
+                        }
+
                         Mat grayFrame = new Mat();
-                        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
-                        Imgproc.equalizeHist(grayFrame, grayFrame);
+                        MatOfRect faces = new MatOfRect();
 
-                        this.faceDetector.detectMultiScale(grayFrame, faces);
+                        try {
+                            // 3. Image Conversion
+                            Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+                            Imgproc.equalizeHist(grayFrame, grayFrame);
 
-                        // Debug: Agar chehra mila to batao
-                        if (faces.toArray().length > 0) {
-                            System.out.println("👀 Chehra Nazar Aya! (Faces: " + faces.toArray().length + ")");
-                        }
+                            // 4. Detection Logic
+                            this.faceDetector.detectMultiScale(grayFrame, faces);
 
-                        // 2. Loop through faces
-                        for (Rect rect : faces.toArray()) {
-                            // Green Box Draw karo
-                            Imgproc.rectangle(frame, new Point(rect.x, rect.y),
-                                    new Point(rect.x + rect.width, rect.y + rect.height),
-                                    new Scalar(0, 255, 0), 2);
-
-                            // 3. Recognize Face
-                            Mat faceOnly = new Mat(grayFrame, rect);
-
-                            // Recognizer ko call karo
-                            String rollNo = recognizer.recognizeFace(faceOnly);
-
-                            if (rollNo != null) {
-                                System.out.println("🎉 PEHCHAN LIYA! Roll No: " + rollNo);
-
-                                Platform.runLater(() -> markAttendance(rollNo));
-
-                                Imgproc.putText(frame, "ID: " + rollNo,
-                                        new Point(rect.x, rect.y - 10),
-                                        Imgproc.FONT_HERSHEY_SIMPLEX, 1.0,
-                                        new Scalar(0, 255, 0), 2);
-                            } else {
-                                // Agar match nahi hua
-                                System.out.println("❌ Chehra saaf nahi hai ya match nahi hua.");
+                            // Debug: Agar 1 bhi chehra mila to foran batao
+                            if (faces.toArray().length > 0) {
+                                System.out.println("👀 FACE DETECTED: " + faces.toArray().length);
                             }
+
+                            for (Rect rect : faces.toArray()) {
+                                Imgproc.rectangle(frame, new Point(rect.x, rect.y),
+                                        new Point(rect.x + rect.width, rect.y + rect.height),
+                                        new Scalar(0, 255, 0), 2);
+
+                                Mat faceOnly = new Mat(grayFrame, rect);
+
+                                // 5. Recognition Check
+                                String rollNo = recognizer.recognizeFace(faceOnly);
+
+                                if (rollNo != null) {
+                                    System.out.println("🎉 MATCH: " + rollNo);
+                                    Platform.runLater(() -> markAttendance(rollNo));
+                                    Imgproc.putText(frame, rollNo, new Point(rect.x, rect.y-10),
+                                            Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0,255,0), 2);
+                                } else {
+                                    // System.out.println("❌ Face detected but not recognized");
+                                }
+                            }
+
+                            Image imageToShow = mat2Image(frame);
+                            Platform.runLater(() -> cameraView.setImage(imageToShow));
+                        } catch (Exception e) {
+                            System.out.println("❌ ERROR during Processing: " + e.getMessage());
                         }
 
-                        Image imageToShow = mat2Image(frame);
-                        Platform.runLater(() -> cameraView.setImage(imageToShow));
                     } else {
-                        System.out.println("⚠️ Camera frame read nahi kar pa raha.");
+                        System.out.println("⚠️ Warning: Frame read failed (Blank Frame)");
                     }
                 };
 
@@ -220,44 +176,54 @@ public class AttendanceController {
         }
     }
 
-    // --- ATTENDANCE MARKING ---
-    // --- ATTENDANCE MARKING (WITH COOLDOWN) ---
+    // --- ATTENDANCE MARKING (DATABASE ONLY) ---
     private void markAttendance(String rollNo) {
         long currentTime = System.currentTimeMillis();
 
-        // Check: Kya yeh banda pehle scan hua hai?
+        // 1. Cooldown Check (Taake duplicate entry na ho)
         if (lastScanTime.containsKey(rollNo)) {
             long lastTime = lastScanTime.get(rollNo);
-
-            // Agar abhi Cooldown time nahi guzra
             if ((currentTime - lastTime) < COOLDOWN_TIME) {
-                // Console mein bata do, lekin attendance mat lagao
-                // System.out.println("⏳ Wait! " + rollNo + " ki attendance pehle hi lag chuki hai.");
+                // Abhi 1 minute nahi guzra, ignore karo
                 return;
             }
         }
 
-        // --- AGAR KAFI WAQT GUZAR GAYA HAI TO ATTENDANCE LAGAO ---
-
-        // 1. Time Update karo
+        // --- NEW ENTRY ---
         lastScanTime.put(rollNo, currentTime);
 
-        // 2. Database se naam nikalo
+        // 2. Database se Naam lo
         String studentName = getStudentNameFromDB(rollNo);
         String timeStr = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
-        // 3. Table Update
+        // 3. Screen Table Update
         attendanceData.add(new AttendanceRow(rollNo, studentName, timeStr));
-
-        // 4. Status Update
         statusLabel.setText("Verified: " + studentName);
         statusLabel.setStyle("-fx-text-fill: #2ecc71;"); // Green
 
-        // 5. Database Save
+        // 4. ⭐ DATABASE SAVE (No File Export)
         saveAttendanceToDB(rollNo, studentName);
+    }
 
-        // 6. Sound Effect (Optional - Future mein)
-        System.out.println("✅ Attendance Marked for: " + studentName);
+    private void saveAttendanceToDB(String rollNo, String name) {
+        // Query: Date aur Time automatically CURDATE() aur CURTIME() se aayega
+        String query = "INSERT INTO attendance_logs (student_roll_number, student_name, attendance_date, attendance_time) VALUES (?, ?, CURDATE(), CURTIME())";
+
+        try (Connection conn = DatabaseHandler.getDBConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setString(1, rollNo);
+            pst.setString(2, name);
+
+            int result = pst.executeUpdate();
+            if (result > 0) {
+                System.out.println("✅ Database Saved Successfully: " + name);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("❌ Database Error: Attendance save nahi hui!");
+        }
     }
 
     private String getStudentNameFromDB(String rollNo) {
@@ -272,17 +238,6 @@ public class AttendanceController {
             }
         } catch (Exception e) { e.printStackTrace(); }
         return name;
-    }
-
-    private void saveAttendanceToDB(String rollNo, String name) {
-        String query = "INSERT INTO attendance_logs (student_roll_number, student_name, attendance_date, attendance_time) VALUES (?, ?, CURDATE(), CURTIME())";
-        try (Connection conn = DatabaseHandler.getDBConnection();
-             PreparedStatement pst = conn.prepareStatement(query)) {
-            pst.setString(1, rollNo);
-            pst.setString(2, name);
-            pst.executeUpdate();
-            System.out.println("✅ Database Updated for: " + name);
-        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void stopCamera() {

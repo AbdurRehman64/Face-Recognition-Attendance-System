@@ -1,6 +1,7 @@
 package login;
 
 import javafx.application.Platform;
+import org.opencv.videoio.Videoio;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -79,7 +80,9 @@ public class DashboardController {
     // --- CAMERA & DETECTION LOGIC ---
     private void startCamera() {
         if (!cameraActive) {
-            capture.open(0);
+            // 👇 Yahan Change kiya hai
+            capture = new VideoCapture(0, Videoio.CAP_DSHOW);
+
             if (capture.isOpened()) {
                 cameraActive = true;
 
@@ -249,9 +252,35 @@ public class DashboardController {
 
     @FXML
     private void goToReports(ActionEvent event) {
-        System.out.println("Navigating to Reports...");
-    }
+        System.out.println("🔄 Trying to open Reports Screen..."); // Debugging Line
 
+        try {
+            // 1. FXML Load karo
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ReportsView.fxml"));
+            Parent root = loader.load();
+
+            // 2. Scene Set karo
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+
+            // 3. CSS Load (Agar hai to)
+            String cssPath = "/css/style.css";
+            if (getClass().getResource(cssPath) != null) {
+                scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+            }
+
+            // 4. Show karo
+            stage.setScene(scene);
+            stage.setTitle("Attendance Reports");
+            stage.show();
+
+            System.out.println("✅ Reports Screen Opened Successfully!");
+
+        } catch (IOException e) {
+            System.out.println("❌ ERROR: Reports Screen nahi khul rahi!");
+            e.printStackTrace(); // Console mein error dekhein
+        }
+    }
     @FXML
     private void handleTrainBtn(ActionEvent event) {
         System.out.println("Training Data...");
@@ -277,6 +306,11 @@ public class DashboardController {
                 capture.release();
             }
         }
+    }
+    @FXML
+    private void handleDashboardBtn(ActionEvent event) {
+        // Already on dashboard, do nothing or refresh
+        System.out.println("Already on Dashboard");
     }
 
     private void loadScreen(ActionEvent event, String fxmlPath, String title) {

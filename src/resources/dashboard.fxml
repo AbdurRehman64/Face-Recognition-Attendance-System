@@ -51,15 +51,15 @@
 
                 <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Dashboard" />
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleDashboardBtn" styleClass="nav-btn" text="Dashboard" />
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="+ Add Student" />
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#goToAttendance" styleClass="nav-btn" text="Take Attendance" />
 
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Reports" />
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#goToReports" styleClass="nav-btn" text="Reports" />
 
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Train Data" />
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleTrainBtn" styleClass="nav-btn" text="Train Data" />
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" top="10.0" />

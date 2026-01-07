@@ -100,7 +100,7 @@
                 </columnResizePolicy>
             </TableView>
 
-            <Button fx:id="exportBtn" text="Export Report (CSV)" onAction="#handleExport" styleClass="primary-btn" maxWidth="Infinity"/>
+
         </VBox>
     </right>
 
