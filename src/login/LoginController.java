@@ -20,6 +20,21 @@ import java.sql.SQLException;
 
 public class LoginController {
 
+    // --- INITIALIZE METHOD (Runs when screen loads) ---
+    @FXML
+    public void initialize() {
+        // 1. Enter Key Logic for Username Field
+        // Jab user Username likh kar Enter dabaye, to focus Password par chala jaye
+        usernameField.setOnAction(event -> {
+            passwordField.requestFocus();
+        });
+
+        // Note: Password field par Enter dabane se automatically Login button click hoga
+        // kyunke humne FXML mein defaultButton="true" set kiya tha.
+    }
+
+
+
     // FXML Elements (Inka naam FXML file se match hona chahiye)
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;

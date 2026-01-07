@@ -1,26 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="650.0" prefWidth="1000.0"
-            stylesheets="@css/style.css"
-            xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="login.DashboardController">
+<BorderPane prefHeight="650.0" prefWidth="1000.0" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.DashboardController">
 
     <left>
         <VBox prefWidth="240.0" styleClass="sidebar">
@@ -51,7 +40,15 @@
 
                 <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleDashboardBtn" styleClass="nav-btn" text="Dashboard" />
+                        <Label alignment="CENTER" maxWidth="Infinity" opacity="0.6" text="DASHBOARD" textFill="WHITE">
+                            <font>
+                                <Font name="Segoe UI Black" size="45.0" />
+                            </font>
+                            <padding>
+                                <Insets bottom="25.0" top="15.0" />
+                            </padding>
+                        </Label>
+
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="+ Add Student" />
 
@@ -59,7 +56,7 @@
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#goToReports" styleClass="nav-btn" text="Reports" />
 
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleTrainBtn" styleClass="nav-btn" text="Train Data" />
+<!--                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleTrainBtn" styleClass="nav-btn" text="Train Data" />-->
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" top="10.0" />
@@ -68,7 +65,7 @@
 
                 <VBox>
                     <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
                     <children>
                         <Button alignment="CENTER" maxWidth="Infinity" onAction="#handleLogout" styleClass="logout-btn" text="Logout" />
@@ -137,7 +134,7 @@
 
                         <VBox spacing="5.0">
                             <Label styleClass="input-label" text="Face Capture" />
-                            <StackPane prefHeight="240.0" styleClass="camera-placeholder" style="-fx-background-color: #000;">
+                            <StackPane prefHeight="240.0" style="-fx-background-color: #000;" styleClass="camera-placeholder">
                                 <children>
                                     <ImageView fx:id="cameraView" fitHeight="240.0" fitWidth="320.0" preserveRatio="true" />
                                 </children>
@@ -145,11 +142,11 @@
                         </VBox>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                            <Button text="Reset Form" styleClass="secondary-btn" />
+                            <Button styleClass="secondary-btn" text="Reset Form" />
 
-                            <Button fx:id="captureBtn" text="Capture Face" styleClass="primary-btn" style="-fx-background-color: #e67e22;" />
+                            <Button fx:id="captureBtn" style="-fx-background-color: #e67e22;" styleClass="primary-btn" text="Capture Face" />
 
-                            <Button fx:id="saveBtn" text="Save Student" styleClass="primary-btn" />
+                            <Button fx:id="saveBtn" styleClass="primary-btn" text="Save Student" />
                         </HBox>
                     </children>
                     <padding>

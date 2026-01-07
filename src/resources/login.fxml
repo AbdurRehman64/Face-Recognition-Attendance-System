@@ -87,7 +87,7 @@
                             </font>
                         </Label>
 
-                        <Button fx:id="loginButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleLogin" styleClass="login-btn" text="SIGN IN">
+                        <Button fx:id="loginButton" defaultButton="true" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleLogin" styleClass="login-btn" text="SIGN IN">
                             <font>
                                 <Font name="Segoe UI Bold" size="14.0" />
                             </font>

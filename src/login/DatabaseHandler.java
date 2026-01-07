@@ -9,7 +9,7 @@ public class DatabaseHandler {
     // Database ki settings
     private static final String DB_URL = "jdbc:mysql://localhost:3306/fras_db";
     private static final String USER = "root";
-    private static final String PASS = "root";
+    private static final String PASS = "";
 
     // Yeh method connection wapis karega
     public static Connection getDBConnection() {

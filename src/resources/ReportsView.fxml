@@ -48,13 +48,20 @@
 
                 <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleDashboardBtn" styleClass="nav-btn" text="Dashboard" />
+                        <Label alignment="CENTER" maxWidth="Infinity" opacity="0.6" text="DASHBOARD" textFill="WHITE">
+                            <font>
+                                <Font name="Segoe UI Black" size="45.0" />
+                            </font>
+                            <padding>
+                                <Insets bottom="25.0" top="15.0" />
+                            </padding>
+                        </Label>
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleDashboardBtn" styleClass="nav-btn" text="+ Add Student" />
 
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Take Attendance" onAction="#goToAttendance" />
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="Reports" />
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleTrainBtn" styleClass="nav-btn" text="Train Data" />
+<!--                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleTrainBtn" styleClass="nav-btn" text="Train Data" />-->
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" top="10.0" />

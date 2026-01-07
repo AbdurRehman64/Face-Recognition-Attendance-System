@@ -44,7 +44,7 @@
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="+ Add Student" />
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn" text="Take Attendance"  onAction="#goToAttendance"/>
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onAction="#handleReportsBtn" styleClass="nav-btn" text="Reports" />
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="Train Data" />
+<!--                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" styleClass="nav-btn-active" text="Train Data" />-->
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" top="10.0" />
