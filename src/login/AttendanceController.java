@@ -37,6 +37,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javafx.stage.FileChooser; // Save dialog ke liye
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.File;
+
 public class AttendanceController {
 
     @FXML private ImageView cameraView;
@@ -62,6 +67,61 @@ public class AttendanceController {
     private CascadeClassifier faceDetector;
     private FaceRecognizer recognizer; // Hamari banayi hui class
 
+    // --- EXPORT TO EXCEL (CSV) ---
+    @FXML
+    private void handleExport(ActionEvent event) {
+        // 1. Check karo table khali to nahi?
+        if (attendanceData.isEmpty()) {
+            System.out.println("⚠️ Table khali hai, export karne ke liye kuch nahi.");
+            return;
+        }
+
+        // 2. Save Dialog Kholo
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Attendance Report");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+
+        // Default file name: Attendance_Date.csv
+        String defaultName = "Attendance_" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv";
+        fileChooser.setInitialFileName(defaultName);
+
+        // Window reference lo
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            saveToFile(file);
+        }
+    }
+
+    private void saveToFile(File file) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            // 3. Pehle Headers likho
+            writer.write("Roll Number,Name,Time");
+            writer.newLine();
+
+            // 4. Table ka sara data loop karke likho
+            for (AttendanceRow row : attendanceData) {
+                writer.write(row.getRollNo() + "," + row.getName() + "," + row.getTime());
+                writer.newLine();
+            }
+
+            System.out.println("✅ Report Exported Successfully: " + file.getAbsolutePath());
+            statusLabel.setText("Report Saved!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("❌ Error saving file.");
+        }
+    }
+
+    // Puraana Set hata kar yeh Map use karein
+    // Key: RollNo, Value: Last Attendance Time (in milliseconds)
+    private java.util.Map<String, Long> lastScanTime = new java.util.HashMap<>();
+
+    // Cooldown Time: 30 Minutes (in milliseconds)
+    // 30 * 60 * 1000 = 1800000 ms
+    // Testing ke liye hum 1 Minute rakhte hain (60 * 1000)
+    private static final long COOLDOWN_TIME = 60 * 1000;
     // --- INITIALIZE ---
     @FXML
     public void initialize() {
@@ -161,26 +221,43 @@ public class AttendanceController {
     }
 
     // --- ATTENDANCE MARKING ---
+    // --- ATTENDANCE MARKING (WITH COOLDOWN) ---
     private void markAttendance(String rollNo) {
-        // Agar yeh banda pehle se scan nahi hua
-        if (!scannedRollNumbers.contains(rollNo)) {
+        long currentTime = System.currentTimeMillis();
 
-            // Database se naam nikalo
-            String studentName = getStudentNameFromDB(rollNo);
-            String currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+        // Check: Kya yeh banda pehle scan hua hai?
+        if (lastScanTime.containsKey(rollNo)) {
+            long lastTime = lastScanTime.get(rollNo);
 
-            // 1. Table mein add karo
-            attendanceData.add(new AttendanceRow(rollNo, studentName, currentTime));
-
-            // 2. Duplicate list mein daal do
-            scannedRollNumbers.add(rollNo);
-
-            // 3. Status update
-            statusLabel.setText("Verified: " + studentName);
-
-            // (Optional) Yahan hum Database insert ki query bhi laga sakte hain 'attendance_logs' table mein
-            saveAttendanceToDB(rollNo, studentName);
+            // Agar abhi Cooldown time nahi guzra
+            if ((currentTime - lastTime) < COOLDOWN_TIME) {
+                // Console mein bata do, lekin attendance mat lagao
+                // System.out.println("⏳ Wait! " + rollNo + " ki attendance pehle hi lag chuki hai.");
+                return;
+            }
         }
+
+        // --- AGAR KAFI WAQT GUZAR GAYA HAI TO ATTENDANCE LAGAO ---
+
+        // 1. Time Update karo
+        lastScanTime.put(rollNo, currentTime);
+
+        // 2. Database se naam nikalo
+        String studentName = getStudentNameFromDB(rollNo);
+        String timeStr = new SimpleDateFormat("HH:mm:ss").format(new Date());
+
+        // 3. Table Update
+        attendanceData.add(new AttendanceRow(rollNo, studentName, timeStr));
+
+        // 4. Status Update
+        statusLabel.setText("Verified: " + studentName);
+        statusLabel.setStyle("-fx-text-fill: #2ecc71;"); // Green
+
+        // 5. Database Save
+        saveAttendanceToDB(rollNo, studentName);
+
+        // 6. Sound Effect (Optional - Future mein)
+        System.out.println("✅ Attendance Marked for: " + studentName);
     }
 
     private String getStudentNameFromDB(String rollNo) {

@@ -51,7 +51,7 @@ public class DashboardController {
     private CascadeClassifier faceDetector;
     private MatOfRect faceDetections;
 
-    // ⭐ NEW: Photo ka Path save karne ke liye variable
+    // Photo ka Path save karne ke liye variable
     private String currentImagePath = null;
 
     // --- INITIALIZE ---
@@ -125,51 +125,71 @@ public class DashboardController {
         }
     }
 
-    // --- CAPTURE BUTTON ACTION (Photo Save Logic) ---
+    // --- ⭐ UPDATED: CAPTURE BUTTON ACTION (Multiple Photos) ---
     private void handleCaptureFace(ActionEvent event) {
         String rollNo = rollNoField.getText().trim();
 
-        // Validation: Roll number zaroori hai filename ke liye
         if (rollNo.isEmpty()) {
             System.out.println("⚠️ Error: Pehle Roll Number likhein!");
             return;
         }
 
-        // Check karo face detect hua ya nahi
-        if (this.faceDetections.toArray().length > 0) {
+        // Folder check
+        File directory = new File("saved_faces");
+        if (!directory.exists()) directory.mkdirs();
+
+        int count = 0;
+        int maxPhotos = 10; // Hum 10 Photos save karenge
+
+        // --- LOOP START ---
+        for (int i = 0; i < maxPhotos; i++) {
             Mat frame = new Mat();
+
+            // Har baar naya frame pakdo camera se
             if (capture.read(frame)) {
 
-                // Pehla chehra crop karo
-                Rect rect = this.faceDetections.toArray()[0];
-                Mat faceOnly = new Mat(frame, rect);
-                Imgproc.cvtColor(faceOnly, faceOnly, Imgproc.COLOR_BGR2GRAY);
+                // Detection dobara run karo is naye frame par
+                MatOfRect faces = new MatOfRect();
+                Mat grayFrame = new Mat();
+                Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+                this.faceDetector.detectMultiScale(grayFrame, faces);
 
-                // Folder aur File setup
-                File directory = new File("saved_faces");
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
+                // Agar chehra mila
+                if (faces.toArray().length > 0) {
+                    Rect rect = faces.toArray()[0];
+                    Mat faceOnly = new Mat(frame, rect);
+                    // Grayscale save karenge (Recognition ke liye behtar hai)
+                    Imgproc.cvtColor(faceOnly, faceOnly, Imgproc.COLOR_BGR2GRAY);
 
-                String finalFileName = rollNo + "_" + System.currentTimeMillis() + ".jpg";
-                File fileToSave = new File(directory, finalFileName);
+                    // File Name: RollNo_Time_Counter.jpg
+                    String finalFileName = rollNo + "_" + System.currentTimeMillis() + "_" + i + ".jpg";
+                    File fileToSave = new File(directory, finalFileName);
 
-                // Image Save karo
-                boolean saved = Imgcodecs.imwrite(fileToSave.getAbsolutePath(), faceOnly);
+                    boolean saved = Imgcodecs.imwrite(fileToSave.getAbsolutePath(), faceOnly);
 
-                if (saved) {
-                    // ⭐ Path ko variable mein store kar liya
-                    this.currentImagePath = fileToSave.getAbsolutePath();
+                    if (saved) {
+                        count++;
+                        System.out.println("📸 Photo " + count + " Saved");
 
-                    System.out.println("✅ Photo Saved! Path: " + this.currentImagePath);
-                    captureBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // Green Button
-                    captureBtn.setText("Captured!");
-                } else {
-                    System.out.println("❌ Error: File save nahi hui.");
+                        // Database ke liye sirf pehli photo ka path kaafi hai
+                        if (this.currentImagePath == null) {
+                            this.currentImagePath = fileToSave.getAbsolutePath();
+                        }
+                    }
                 }
             }
+
+            // Thora sa wait karo (50ms) taake photos mein thora difference aaye
+            try { Thread.sleep(50); } catch (Exception e) {}
+        }
+        // --- LOOP END ---
+
+        if (count > 0) {
+            System.out.println("✅ Dataset Created! Total Photos: " + count);
+            captureBtn.setText("Captured (" + count + ")");
+            captureBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
         } else {
-            System.out.println("⚠️ No Face Detected!");
+            System.out.println("⚠️ Error: Chehra detect nahi hua. Dobara try karein.");
         }
     }
 
@@ -179,7 +199,6 @@ public class DashboardController {
         String roll = rollNoField.getText();
         String dept = depField.getText();
 
-        // Validation
         if (name.isEmpty() || roll.isEmpty() || dept.isEmpty()) {
             System.out.println("⚠️ Please fill all fields!");
             return;
@@ -187,14 +206,12 @@ public class DashboardController {
 
         if (this.currentImagePath == null) {
             System.out.println("⚠️ Warning: Photo capture nahi ki gayi!");
-            // Agar aap chahein to yahan 'return' laga dein taake bina photo save na ho
         }
 
         saveToDatabase(name, roll, dept);
     }
 
     private void saveToDatabase(String name, String roll, String dept) {
-        // Query mein 4th value (face_image_path) add ki hai
         String query = "INSERT INTO students (full_name, roll_number, department, face_image_path) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHandler.getDBConnection();
@@ -203,7 +220,7 @@ public class DashboardController {
             pst.setString(1, name);
             pst.setString(2, roll);
             pst.setString(3, dept);
-            pst.setString(4, this.currentImagePath); // Photo ka path yahan jayega
+            pst.setString(4, this.currentImagePath);
 
             int result = pst.executeUpdate();
             if (result > 0) {
@@ -215,7 +232,7 @@ public class DashboardController {
                 depField.clear();
                 captureBtn.setStyle(null);
                 captureBtn.setText("Capture Face");
-                this.currentImagePath = null; // Path reset
+                this.currentImagePath = null;
             }
         } catch (Exception e) {
             e.printStackTrace();

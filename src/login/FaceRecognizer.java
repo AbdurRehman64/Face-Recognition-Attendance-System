@@ -12,41 +12,37 @@ public class FaceRecognizer {
 
     private static final String IMAGE_FOLDER = "saved_faces";
 
-    // 👇 Threshold kam kar diya hai (Pehle 0.50 tha)
-    private static final double THRESHOLD = 0.40;
+    // Threshold abhi 0.30 hi rakhein
+    private static final double THRESHOLD = 0.30;
 
     public String recognizeFace(Mat liveFace) {
         File folder = new File(IMAGE_FOLDER);
         File[] files = folder.listFiles((dir, name) -> name.endsWith(".jpg") || name.endsWith(".png"));
 
-        if (files == null || files.length == 0) {
-            System.out.println("⚠️ Warning: Saved faces folder khali hai!");
-            return null;
-        }
+        if (files == null || files.length == 0) return null;
 
         double bestScore = -1.0;
         String identifiedRollNo = null;
 
-        // Live face ko resize karo (Standard Size: 150x150)
-        Mat resizedLive = new Mat();
-        Imgproc.resize(liveFace, resizedLive, new Size(150, 150));
+        // Live Face Process
+        Mat processedLive = preprocessImage(liveFace);
 
         for (File file : files) {
-            Mat savedImage = Imgcodecs.imread(file.getAbsolutePath());
+
+            // ⭐ CHANGE IS HERE: IMREAD_GRAYSCALE flag lagaya hai
+            // Isse pakka ho jayega ke saved photo 1 channel (Gray) hi rahe
+            Mat savedImage = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
+
             if (savedImage.empty()) continue;
 
-            // Saved image ko bhi resize karo (Standard Size: 150x150)
-            Mat resizedSaved = new Mat();
-            Imgproc.resize(savedImage, resizedSaved, new Size(150, 150));
-
-            // Gray scale conversion
-            Imgproc.cvtColor(resizedSaved, resizedSaved, Imgproc.COLOR_BGR2GRAY);
+            // Saved Face Process
+            Mat processedSaved = preprocessImage(savedImage);
 
             // Compare
-            double score = compareHistograms(resizedLive, resizedSaved);
+            double score = compareHistograms(processedLive, processedSaved);
 
-            // 👇 Console mein score print hoga ab
-            // System.out.println("Checking: " + file.getName() + " | Score: " + String.format("%.2f", score));
+            // Debug Print (Ab check karein score kya aa raha hai)
+            // System.out.println("Checking: " + file.getName() + " | Score: " + score);
 
             if (score > THRESHOLD && score > bestScore) {
                 bestScore = score;
@@ -54,13 +50,25 @@ public class FaceRecognizer {
             }
         }
 
-        // Agar score acha mila to return karo
         if (identifiedRollNo != null) {
             System.out.println("✅ MATCH FOUND: " + identifiedRollNo + " (Score: " + bestScore + ")");
             return identifiedRollNo;
         }
 
-        return null; // Koi match nahi mila
+        return null;
+    }
+
+    private Mat preprocessImage(Mat img) {
+        Mat processed = new Mat();
+
+        // Resize
+        Imgproc.resize(img, processed, new Size(150, 150));
+
+        // Equalize (Lighting Fix)
+        // Note: Kyunke humne upar hi Grayscale load kiya hai, yahan conversion ki zaroorat nahi
+        Imgproc.equalizeHist(processed, processed);
+
+        return processed;
     }
 
     private double compareHistograms(Mat img1, Mat img2) {
