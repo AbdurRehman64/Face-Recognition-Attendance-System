@@ -2,6 +2,11 @@
 
 An automated attendance management solution that leverages Computer Vision and Deep Learning to identify individuals and log attendance in real-time. This system eliminates manual errors, prevents "proxy" attendance, and provides a seamless digital experience for educational institutions and corporate offices.
 
+**UML Diagram**
+
+<img width="922" height="1068" alt="lLRVQzim47ulz7yGtSDSrfHjZ0tCA6sJT0aaJOczxc6CSh4lZgWjUPAShXtxttTod5IndROmc1ySIVVTh-_kh9ng0yeKMRg_jx-dRxd8GK76eXIqFZD6yLbXS1X94V07P6zTp0oYsqJ9GiHTcKh5Niq_p3_DFrf3EOaWGNPm0H6oAKOo4TnmALXmhmrc1-otXJ5wI" src="https://github.com/user-attachments/assets/d353db38-1505-4754-8c21-0d9b3c391d13" />
+
+
 **Key Features**
 
 **Real-time Detection:** High-speed face detection using Haar Cascades or HOG.
