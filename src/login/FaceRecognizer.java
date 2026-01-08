@@ -12,7 +12,7 @@ public class FaceRecognizer {
 
     private static final String IMAGE_FOLDER = "saved_faces";
 
-    private static final double THRESHOLD = 0.3;
+    private static final double THRESHOLD = 0.35;
 
     public String recognizeFace(Mat liveFace) {
         File folder = new File(IMAGE_FOLDER);
