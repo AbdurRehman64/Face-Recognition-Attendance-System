@@ -20,9 +20,15 @@ The system features a streamlined dashboard for administrators and users.
 
 1. Main Dashboard
    A central hub for starting the camera, registering new students, and viewing records.
+  
+   ![WhatsApp Image 2026-01-08 at 11 53 42 AM](https://github.com/user-attachments/assets/8c008204-04eb-49bf-a6c5-9141d94a792d)
 
-2. Live Recognition Window
+
+3. Live Recognition Window
    Displays the live webcam feed with bounding boxes and names of recognized individuals.
+
+   ![WhatsApp Image 2026-01-08 at 11 53 42 AM (1)](https://github.com/user-attachments/assets/641f080f-859b-4d0a-b7df-1c7bb1c8790d)
+
 
 
 **Tech Stack**
